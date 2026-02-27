@@ -33,6 +33,7 @@ set(SRC_QT_MODEL_TESTS source/scwx/qt/model/imgui_context_model.test.cpp
                        source/scwx/qt/model/marker_model.test.cpp)
 set(SRC_QT_SETTINGS_TESTS source/scwx/qt/settings/settings_container.test.cpp
                           source/scwx/qt/settings/settings_variable.test.cpp)
+set(SRC_QT_TYPES_TESTS source/scwx/qt/types/hotkey_types.test.cpp)
 set(SRC_QT_UTIL_TESTS source/scwx/qt/util/q_file_input_stream.test.cpp
                       source/scwx/qt/util/geographic_lib.test.cpp
                       source/scwx/qt/util/network.test.cpp)
@@ -58,6 +59,7 @@ add_executable(wxtest ${SRC_MAIN}
                       ${SRC_QT_MAP_TESTS}
                       ${SRC_QT_MODEL_TESTS}
                       ${SRC_QT_SETTINGS_TESTS}
+                      ${SRC_QT_TYPES_TESTS}
                       ${SRC_QT_UTIL_TESTS}
                       ${SRC_UTIL_TESTS}
                       ${SRC_WSR88D_TESTS}
@@ -74,6 +76,7 @@ source_group("Source Files\\qt\\manager"  FILES ${SRC_QT_MANAGER_TESTS})
 source_group("Source Files\\qt\\map"      FILES ${SRC_QT_MAP_TESTS})
 source_group("Source Files\\qt\\model"    FILES ${SRC_QT_MODEL_TESTS})
 source_group("Source Files\\qt\\settings" FILES ${SRC_QT_SETTINGS_TESTS})
+source_group("Source Files\\qt\\types"    FILES ${SRC_QT_TYPES_TESTS})
 source_group("Source Files\\qt\\util"     FILES ${SRC_QT_UTIL_TESTS})
 source_group("Source Files\\util"         FILES ${SRC_UTIL_TESTS})
 source_group("Source Files\\wsr88d"       FILES ${SRC_WSR88D_TESTS})
