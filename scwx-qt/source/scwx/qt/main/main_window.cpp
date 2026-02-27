@@ -523,7 +523,7 @@ void MainWindow::on_actionOpenNexrad_triggered()
 
    QFileDialog* dialog = new QFileDialog(this);
 
-   dialog->setFileMode(QFileDialog::ExistingFile);
+   dialog->setFileMode(QFileDialog::ExistingFiles);
    dialog->setNameFilter(tr(nexradFilter.c_str()));
    dialog->setAttribute(Qt::WA_DeleteOnClose);
 
@@ -538,46 +538,57 @@ void MainWindow::on_actionOpenNexrad_triggered()
 
    connect(
       dialog,
-      &QFileDialog::fileSelected,
+      &QFileDialog::filesSelected,
       this,
-      [=, this](const QString& file)
+      [=, this](const QStringList& files)
       {
-         logger_->info("Selected: {}", file.toStdString());
-
          auto        radarSite = p->activeMap_->GetRadarSite();
          std::string currentRadarSite =
             (radarSite != nullptr) ? radarSite->id() : std::string {};
 
-         std::shared_ptr<request::NexradFileRequest> request =
-            std::make_shared<request::NexradFileRequest>(currentRadarSite);
+         for (const auto& file : files)
+         {
+            logger_->info("Selected: {}", file.toStdString());
 
-         connect( //
-            request.get(),
-            &request::NexradFileRequest::RequestComplete,
-            this,
-            [=, this](std::shared_ptr<request::NexradFileRequest> request)
-            {
-               std::shared_ptr<types::RadarProductRecord> record =
-                  request->radar_product_record();
+            std::shared_ptr<request::NexradFileRequest> request =
+               std::make_shared<request::NexradFileRequest>(currentRadarSite);
 
-               if (record != nullptr)
+            connect( //
+               request.get(),
+               &request::NexradFileRequest::RequestComplete,
+               this,
+               [=, this](std::shared_ptr<request::NexradFileRequest> request)
                {
-                  currentMap->SetAutoRefresh(false);
-                  currentMap->SelectRadarProduct(record);
-               }
-               else
-               {
-                  QMessageBox* messageBox = new QMessageBox(this);
-                  messageBox->setIcon(QMessageBox::Warning);
-                  messageBox->setText(
-                     QString("%1\n%2").arg(tr("Unrecognized NEXRAD Product:"),
-                                           QDir::toNativeSeparators(file)));
-                  messageBox->setAttribute(Qt::WA_DeleteOnClose);
-                  messageBox->open();
-               }
-            });
+                  std::shared_ptr<types::RadarProductRecord> record =
+                     request->radar_product_record();
 
-         manager::RadarProductManager::LoadFile(file.toStdString(), request);
+                  if (record != nullptr)
+                  {
+                     currentMap->SetAutoRefresh(false);
+                     currentMap->SelectRadarProduct(record);
+                     // Switch to archive mode at the file's recorded time so
+                     // that historical warning data is loaded automatically.
+                     // When multiple files are loaded, the last successfully
+                     // loaded file determines the final timeline position.
+                     p->timelineManager_->SetViewType(
+                        types::MapTime::Archive);
+                     p->timelineManager_->SetDateTime(record->time());
+                  }
+                  else
+                  {
+                     QMessageBox* messageBox = new QMessageBox(this);
+                     messageBox->setIcon(QMessageBox::Warning);
+                     messageBox->setText(
+                        QString("%1\n%2").arg(
+                           tr("Unrecognized NEXRAD Product:"),
+                           QDir::toNativeSeparators(file)));
+                     messageBox->setAttribute(Qt::WA_DeleteOnClose);
+                     messageBox->open();
+                  }
+               });
+
+            manager::RadarProductManager::LoadFile(file.toStdString(), request);
+         }
       });
 
    dialog->open();
