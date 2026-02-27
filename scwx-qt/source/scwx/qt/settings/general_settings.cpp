@@ -91,6 +91,7 @@ public:
       trackLocation_.SetDefault(false);
       updateNotificationsEnabled_.SetDefault(true);
       warningsProvider_.SetDefault(defaultWarningsProviderValue);
+      customNexradFeedUrl_.SetDefault("");
       cursorIconAlwaysOn_.SetDefault(false);
       radarSiteThreshold_.SetDefault(0.0);
       highPrivilegeWarningEnabled_.SetDefault(true);
@@ -192,6 +193,15 @@ public:
       warningsProvider_.SetValidator(
          [](const std::string& value)
          { return QUrl {QString::fromStdString(value)}.isValid(); });
+      // An empty value means "use the default AWS source". A non-empty value
+      // must be a syntactically valid URL; further checks (reachability,
+      // correct NEXRAD path layout, etc.) are deferred to runtime.
+      customNexradFeedUrl_.SetValidator(
+         [](const std::string& value)
+         {
+            return value.empty() ||
+                   QUrl {QString::fromStdString(value)}.isValid();
+         });
    }
 
    ~Impl()                       = default;
@@ -237,6 +247,8 @@ public:
    SettingsVariable<bool>        trackLocation_ {"track_location"};
    SettingsVariable<bool> updateNotificationsEnabled_ {"update_notifications"};
    SettingsVariable<std::string> warningsProvider_ {"warnings_provider"};
+   SettingsVariable<std::string> customNexradFeedUrl_ {
+      "custom_nexrad_feed_url"};
    SettingsVariable<bool>        cursorIconAlwaysOn_ {"cursor_icon_always_on"};
    SettingsVariable<double>      radarSiteThreshold_ {"radar_site_threshold"};
    SettingsVariable<bool>        highPrivilegeWarningEnabled_ {
@@ -281,6 +293,7 @@ GeneralSettings::GeneralSettings() :
                       &p->trackLocation_,
                       &p->updateNotificationsEnabled_,
                       &p->warningsProvider_,
+                      &p->customNexradFeedUrl_,
                       &p->cursorIconAlwaysOn_,
                       &p->radarSiteThreshold_,
                       &p->highPrivilegeWarningEnabled_,
@@ -464,6 +477,11 @@ SettingsVariable<std::string>& GeneralSettings::warnings_provider() const
    return p->warningsProvider_;
 }
 
+SettingsVariable<std::string>& GeneralSettings::custom_nexrad_feed_url() const
+{
+   return p->customNexradFeedUrl_;
+}
+
 SettingsVariable<bool>& GeneralSettings::cursor_icon_always_on() const
 {
    return p->cursorIconAlwaysOn_;
@@ -544,6 +562,7 @@ bool operator==(const GeneralSettings& lhs, const GeneralSettings& rhs)
            lhs.p->updateNotificationsEnabled_ ==
               rhs.p->updateNotificationsEnabled_ &&
            lhs.p->warningsProvider_ == rhs.p->warningsProvider_ &&
+           lhs.p->customNexradFeedUrl_ == rhs.p->customNexradFeedUrl_ &&
            lhs.p->cursorIconAlwaysOn_ == rhs.p->cursorIconAlwaysOn_ &&
            lhs.p->radarSiteThreshold_ == rhs.p->radarSiteThreshold_ &&
            lhs.p->highPrivilegeWarningEnabled_ ==

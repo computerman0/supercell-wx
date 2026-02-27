@@ -145,6 +145,7 @@ public:
           &nmeaBaudRate_,
           &nmeaSource_,
           &warningsProvider_,
+          &customNexradFeedUrl_,
           &radarSiteThreshold_,
           &antiAliasingEnabled_,
           &autoNavigateToWsr88dOnly_,
@@ -274,6 +275,7 @@ public:
    settings::SettingsInterface<std::string>  theme_ {};
    settings::SettingsInterface<std::string>  themeFile_ {};
    settings::SettingsInterface<std::string>  warningsProvider_ {};
+   settings::SettingsInterface<std::string>  customNexradFeedUrl_ {};
    settings::SettingsInterface<double>       radarSiteThreshold_ {};
    settings::SettingsInterface<bool>         antiAliasingEnabled_ {};
    settings::SettingsInterface<bool>         autoNavigateToWsr88dOnly_ {};
@@ -871,6 +873,12 @@ void SettingsDialogImpl::SetupGeneralTab()
    warningsProvider_.SetEditWidget(self_->ui->warningsProviderLineEdit);
    warningsProvider_.SetResetButton(self_->ui->resetWarningsProviderButton);
    warningsProvider_.EnableTrimming();
+
+   customNexradFeedUrl_.SetSettingsVariable(
+      generalSettings.custom_nexrad_feed_url());
+   customNexradFeedUrl_.SetEditWidget(self_->ui->customNexradFeedLineEdit);
+   customNexradFeedUrl_.SetResetButton(self_->ui->resetCustomNexradFeedButton);
+   customNexradFeedUrl_.EnableTrimming();
 
    radarSiteThreshold_.SetSettingsVariable(
       generalSettings.radar_site_threshold());

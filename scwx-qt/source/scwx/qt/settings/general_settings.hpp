@@ -57,6 +57,7 @@ public:
    [[nodiscard]] SettingsVariable<bool>&        track_location() const;
    [[nodiscard]] SettingsVariable<bool>& update_notifications_enabled() const;
    [[nodiscard]] SettingsVariable<std::string>& warnings_provider() const;
+   [[nodiscard]] SettingsVariable<std::string>& custom_nexrad_feed_url() const;
    [[nodiscard]] SettingsVariable<bool>&        cursor_icon_always_on() const;
    [[nodiscard]] SettingsVariable<double>&      radar_site_threshold() const;
    [[nodiscard]] SettingsVariable<bool>& high_privilege_warning_enabled() const;
